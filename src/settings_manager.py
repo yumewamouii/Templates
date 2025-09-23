@@ -2,7 +2,7 @@ import os
 import json
 
 
-from company_model import companyModel
+from src.models.company_model import companyModel
 
 
 class settingManager():
