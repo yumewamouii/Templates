@@ -1,87 +1,87 @@
 class Settings:
-    # Поля с начальными значениями
-    _tin = ''
-    _account = ''
-    _corr_account = ''
-    _bik = ''
-    _name = ''
-    _ownership_type = ''
+    # Properties with default values
+    __tin = ''
+    __account = ''
+    __corr_account = ''
+    __bic = ''
+    __name = ''
+    __ownership_type = ''
 
-    # ИНН
+    # TIN
     @property
-    def tin(self):
-        return self._tin
+    def tin(self) -> str:
+        return self.__tin
 
     @tin.setter
-    def tin(self, value):
-        if isinstance(value, str) and len(value) == 12:
-            self._tin = value
+    def tin(self, value: str) -> str:
+        if isinstance(int(value), int) and isinstance(value, str) and len(value) == 12:
+            self.__tin = value
         else:
-            raise ValueError('TIN must be string and contain 12 characters.')
+            raise ValueError('TIN must be a number and contain 12 characters.')
 
-    # Счет
+    # Account
     @property
-    def account(self):
-        return self._account
+    def account(self) -> str:
+        return self.__account
 
     @account.setter
-    def account(self, value):
-        if isinstance(value, str) and len(value) == 11:
-            self._account = value
+    def account(self, value: str) -> str:
+        if isinstance(int(value), int) and isinstance(value, str) and len(value) == 11:
+            self.__account = value
         else:
-            raise ValueError('account must be string and contain 11 characters.')
+            raise ValueError('account must be a number and contain 11 characters.')
 
     # Correspondent account
     @property
-    def corr_account(self):
-        return self._corr_account
+    def corr_account(self) -> str:
+        return self.__corr_account
 
     @corr_account.setter
-    def corr_account(self, value):
-        if isinstance(value, str) and len(value) == 11:
-            self._corr_account = value
+    def corr_account(self, value: str) -> str:
+        if isinstance(int(value), int) and isinstance(value, str) and len(value) == 11:
+            self.__corr_account = value
         else:
-            raise ValueError('correspondent account must be string and contain 11 characters.')
+            raise ValueError('correspondent account must be a number and contain 11 characters.')
     # BIC
     @property
-    def bic(self):
-        return self._bic
+    def bic(self) -> str:
+        return self.__bic
 
     @bic.setter
-    def bic(self, value):
-        if isinstance(value, str) and len(value) == 9:
-            self._bic = value
+    def bic(self, value: str) -> str:
+        if isinstance(int(value), int) and isinstance(value, int) and len(value) == 9:
+            self.__bic = value
         else:
-            raise ValueError("BIC must be string and contain 9 characters.")
+            raise ValueError("BIC must be a number and contain 9 characters.")
 
     # Наименование
     @property
-    def name(self):
-        return self._name
+    def name(self) -> str:
+        return self.__name
 
     @name.setter
-    def name(self, value):
+    def name(self, value: str) -> str:
         if isinstance(value, str):
-            self._name = value
+            self.__name = value
         else:
             raise ValueError("name must be string.")
 
     # Вид собственности
     @property
-    def ownership_type(self):
-        return self._ownership_type
+    def ownership_type(self) -> str:
+        return self.__ownership_type
 
     @ownership_type.setter
-    def ownership_type(self, value):
+    def ownership_type(self, value: str) -> str:
         if isinstance(value, str) and len(value) == 5:
-            self._ownership_type = value
+            self.__ownership_type = value
         else:
             raise ValueError("ownership type must be string and contain 5 characters.")
 
     def __str__(self):
-        return (f"ИНН: {self._tin}\n"
-                f"Счет: {self._account}\n"
-                f"Корреспондентский счет: {self._corr_account}\n"
-                f"БИК: {self._bic}\n"
-                f"Наименование: {self._name}\n"
-                f"Вид собственности: {self._ownership_type}")
+        return (f"ИНН: {self.__tin}\n"
+                f"Счет: {self.__account}\n"
+                f"Корреспондентский счет: {self.__corr_account}\n"
+                f"БИК: {self.__bic}\n"
+                f"Наименование: {self.__name}\n"
+                f"Вид собственности: {self.__ownership_type}")

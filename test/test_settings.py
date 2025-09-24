@@ -13,13 +13,13 @@ class testSettings(unittest.TestCase):
 
     def test_tin_valid(self):
         settings = Settings()
-        settings.tin = '123456789012'
-        self.assertEqual(settings.tin, '123456789012')
+        settings.tin = 123456789012
+        self.assertEqual(settings.tin, 123456789012)
 
 
     def test_tin_invalid(self):
         settings = Settings()
-        with self.assertRaises(ValueError, msg='TIN must be string and contain 12 characters.'):
+        with self.assertRaises(ValueError, msg='TIN must be a number and contain 12 characters.'):
             settings.tin = '123456'
     
 
