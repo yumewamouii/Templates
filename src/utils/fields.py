@@ -6,10 +6,11 @@ from src.exceptions.validation import ArgumentException
 
 
 class ValidatedField:
-    def __init__(self, expected_type: object, length: int | None = None, strip: bool = False,
-                nullable: bool = False, default: str | None = None, blank: bool = False):
+    def __init__(self, expected_type: object, length: int | None = None, max_length: int | None = None, strip: bool = False,
+                nullable: bool = False, default: Any | None = None, blank: bool = False):
         self.__expected_type = expected_type
         self.__length = length
+        self.__max_length = max_length
         self.__strip = strip
         self.__nullable = nullable
         self.__default = default
@@ -19,6 +20,12 @@ class ValidatedField:
 
     def __set_name__(self, owner: type, namefield: str) -> None:
         self.__private_name = f'__{owner.__name__}__{namefield}'
+
+    
+    def __get_default(self):
+        if callable(self.__default):
+            return self.__default()
+        return self.__default
     
 
     def __get__(self, obj: Any, obj_type: object = None) -> str:
@@ -31,9 +38,9 @@ class ValidatedField:
                 elif self.__expected_type == int:
                     return 0
             elif self.__default is not None:
-                return self.__default
+                return self.__get_default()
             return None
-        return getattr(obj, self.__private_name, self.__default)
+        return getattr(obj, self.__private_name, self.__get_default())
     
 # TODO:НЕОБХОДИМО ПОПРАВИТЬ, ЧТОБЫ ОН МОГ ПРИНИМАТЬ ЛЮБЫЕ ЗНАЧЕНИЯ (ПО КРАЙНЕЙ МЕРЕ, INT ИЛИ STR)
     def __set__(self, obj: object, value: Any) -> None:
@@ -45,9 +52,9 @@ class ValidatedField:
                 elif self.__expected_type == int:
                     setattr(obj, self.__private_name, 0)
                     return
-            #elif self.__default is not None:
-                #setattr(obj, self.__protected_name, self.__default)
-                #return
+            elif self.__default is not None:
+                setattr(obj, self.__private_name, self.__get_default())
+                return
             raise ArgumentException(f'Field can not be None')
         if value == 0:
             if self.__blank:
@@ -57,7 +64,7 @@ class ValidatedField:
         if self.__blank and len(str(value).strip()) == 0:
             setattr(obj, self.__private_name, '')
             return
-        Validator.validate(value, self.__expected_type, self.__length)
+        Validator.validate(value, self.__expected_type, self.__length, self.__max_length)
         if self.__strip and isinstance(value, str):
             value = value.strip()
         setattr(obj, self.__private_name, value)
