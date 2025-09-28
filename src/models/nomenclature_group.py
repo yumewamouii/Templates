@@ -3,4 +3,4 @@ from src.utils.fields import ValidatedField
 
 
 class NomenclatureGroup(BaseModel):
-    pass
+    name = ValidatedField(str, max_length = 50, nullable = False, blank = False)

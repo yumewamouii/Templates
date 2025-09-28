@@ -12,6 +12,7 @@ class MeasurementUnit(BaseModel):
     conversion_factor = ValidatedField(int, nullable = False, blank = False, default = 1)
 
 
+    #Create a new MeasurementUnit object with a given name and conversion factor
     @classmethod
     def range_model(cls, name: str, factor: int = 1, base_unit: 'MeasurementUnit' | None = None) -> 'MeasurementUnit':
         unit = cls()
@@ -28,8 +29,8 @@ class MeasurementUnit(BaseModel):
         return unit
 
     def __str__(self):
-        return (f'Идентификационный номер: {self.id}\n'
-                f'Базовая единица измерения: {self.basic_unit}\n'
-                f'Коэффициент пересчета: {self.conversion_factor}')
+        return (f'Identification number: {self.id}\n'
+                f'Basic unit of measurement: {self.basic_unit}\n'
+                f'Conversion factor: {self.conversion_factor}')
 
 

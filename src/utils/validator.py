@@ -6,9 +6,8 @@ from src.exceptions.validation import ArgumentException, OperationException
 
 class Validator:
     @staticmethod
-    def validate(value: Any, expected_type: object, length: int | None = None, max_length: int | None = None) -> bool:
-        #if value is None:
-            #raise ArgumentException('Empty argument')
+    def validate(value: Any, expected_type: object, 
+                 length: int | None = None, max_length: int | None = None) -> bool:
         
 
         if not isinstance(value, expected_type):

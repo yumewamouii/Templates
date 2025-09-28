@@ -6,7 +6,7 @@ from src.utils.fields import ValidatedField
 
 
 class Company(BaseModel):
-    id = ValidatedField(str, nullable=False , blank = False)
+    id = ValidatedField(str, nullable=False, blank = False)
     name = ValidatedField(str, strip = True, default = 'Рога и копыта', nullable = False)
     tin = ValidatedField(int, length = 12, default = 123456789012, nullable = False)
     account = ValidatedField(int, length = 11, blank = True)
@@ -21,13 +21,13 @@ class Company(BaseModel):
 
 
     def __str__(self):
-        return (f"Идентификационный номер: {self.id}\n"
-                f"ИНН: {self.tin}\n"
-                f"Счет: {self.account}\n"
-                f"Корреспондентский счет: {self.corr_account}\n"
-                f"БИК: {self.bic}\n"
-                f"Наименование: {self.name}\n"
-                f"Вид собственности: {self.ownership_type}")
+        return (f"Identification number: {self.id}\n"
+                f"TIN: {self.tin}\n"
+                f"Account: {self.account}\n"
+                f"Correspondent account: {self.corr_account}\n"
+                f"BIC: {self.bic}\n"
+                f"Name: {self.name}\n"
+                f"Ownership type: {self.ownership_type}")
     
 
     def __repr__(self):
