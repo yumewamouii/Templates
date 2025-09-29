@@ -36,7 +36,6 @@ class testLoad(unittest.TestCase):
     
 
     def test_convert(self):
-        self.sample_dict = self.sample_dict['company']
         self.sm.convert(self.sample_dict)
         self.assertEqual(self.sm._settings.company.name, 'Пога и Попыта')
         self.assertEqual(self.sm._settings.company.tin, 123456789012)
