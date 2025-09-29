@@ -2,63 +2,59 @@ import os
 import json
 
 
-from src.models.company_model import companyModel
+from src.models.settings import Settings
+from handlers.file_search import find_file
 
 
 class settingManager():
-    __filename: str = ""
-    __company: companyModel = None
+    __filename: str = 'settings.json'
+    __settings = Settings()
 
-
-    def __init__(self):
-        self.set_default()
-    
-
-    @property
-    def company(self) -> companyModel:
-        return self.__company
+#Singleton pattern
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(settingManager, cls).__new__(cls)
+        return cls.instance
 
 
     @property
-    def filename(self) -> str:
-        return self.__filename
+    def settings(self) -> Settings:
+        return self.__settings
     
-    #Full path to settings file
-    @filename.setter
-    def filename(self, value: str):
-        if value.strip() == '':
-            return
-
-
-        if os.path.exists(value):
-            self.__filename = value.strip()
-        else:
-            raise Exception("File does not exist")
-    
-
-    #Load settings from json file
-    def load(self) -> bool:
-        if self.__filename.strip == '':
-            raise Exception('File does not exist')
+    #Load properties of Settings class from dictionary
+    def load_from_dict(self, curr_dict: dict) -> None:
         try:
-            with open(self.__filename.strip(), 'r') as file_instance:
-                data = json.load(file_instance)
-
-
-                if 'company' in data.keys():
-                    item = data['company']
-                    self.__company.name = item['name']
-                    return True
-            
-            return False
-        
+            if not isinstance(curr_dict, dict):
+                raise Exception('Not a dictionary')
+            for company_key, company_data in curr_dict.items():
+                for key, value in company_data.items():
+                    if hasattr(self.__settings, key):
+                        setattr(self.__settings, key, value)
         except:
-            return False
+            raise Exception()
     
+    #Load properties of Settings class from json file
+    def load_from_json(self, filename: str = ''):
+        if not isinstance(filename, str):
+            raise Exception('Filename must be string.')
+        if filename != '':
+            self.__filename = filename
+        
 
-    def set_default(self):
-        self.__company = companyModel()
-        self.__company.name = 'Рога и копыта'
+        full_name = find_file(filename = self.__filename)
+        if full_name is None:
+            raise Exception(f'File {self.__filename} does not exist.')
+
+
+        try:
+            with open(full_name, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+                for company_key, company_data in data.items():
+                    for key, value in company_data.items():
+                        if hasattr(self.__settings, key):
+                            setattr(self.__settings, key, value)
+        except:
+            raise Exception('Failed to load settings from json file')
 
 
 
