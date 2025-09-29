@@ -11,7 +11,6 @@ class Organization(BaseModel):
     ownership_type = ValidatedField(str, strip = True, length = 5, blank = True)
 
 
-    #Copying properties from settings
     def __init__(self, settings: Settings | None = None):
         if settings is not None:
             company_data = settings.company

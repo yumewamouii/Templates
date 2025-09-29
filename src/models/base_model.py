@@ -12,8 +12,11 @@ class BaseModel(AbstractBaseModel):
         super().__init__()
 
 
-#The comparison with id, other can be a UUID string
+
     def __eq__(self, other: str) -> bool:
+        """
+        Сравнение с id. other может быть строкой UUID.
+        """
         if isinstance(other, str):
             return self.id == other
         return False

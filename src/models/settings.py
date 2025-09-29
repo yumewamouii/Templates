@@ -8,8 +8,8 @@ class Settings:
     
 
     def __str__(self):
-        return f"Settings of company:\n{self.company}"
+        return f"Настройки компании:\n{self.company}"
 
 
     def __repr__(self):
-        return f"<Settings of company={repr(self.company)}>"
+        return f"<Settings company={repr(self.company)}>"
