@@ -1,6 +1,4 @@
 *.pyc
 .history/
 .coverage
-/.__pycache__/
-/.VSCodeCounter/
-/.vscode/
+/__pycache__/
