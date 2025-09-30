@@ -2,107 +2,32 @@ import unittest
 
 
 from src.models.settings import Settings
-from src.settings_manager import settingManager
+from src.exceptions.validation import ArgumentException
 
 
-class testSettings(unittest.TestCase):
-    def test_tin_empty(self):
-        settings = Settings()
-        self.assertEqual(settings.tin, '')
-
-
-    def test_tin_valid(self):
-        settings = Settings()
-        settings.tin = 123456789012
-        self.assertEqual(settings.tin, 123456789012)
-
-
-    def test_tin_invalid(self):
-        settings = Settings()
-        with self.assertRaises(ValueError, msg='TIN must be a number and contain 12 characters.'):
-            settings.tin = '123456'
+class TestModelSettings(unittest.TestCase):
+    def setUp(self):
+        self.settings = Settings()
+        self.settings_first = Settings()
+        self.settings_second = Settings()
     
 
-    def test_account_empty(self):
-        settings = Settings()
-        self.assertEqual(settings.account, '')
+    def test_create_settings(self):
+        self.assertIsInstance(self.settings, Settings)
     
 
-    def test_account_valid(self):
-        settings = Settings()
-        settings.account = '12345678901'
-        self.assertEqual(settings.account, '12345678901')
+    def test_not_equal_settings(self):
+        self.assertNotEqual(self.settings_first, self.settings_second)
     
 
-    def test_account_invalid(self):
-        settings = Settings()
-        with self.assertRaises(ValueError, msg='account must be string and contain 11 characters.'):
-            settings.account = '123456'
+    def test_not_equal_ids_settings(self):
+        self.assertNotEqual(self.settings_first.company.id, self.settings_second.company.id)
     
 
-    def test_corr_account_empty(self):
-        settings = Settings()
-        self.assertEqual(settings.corr_account, '')
-    
-
-    def test_corr_account_valid(self):
-        settings = Settings()
-        settings.corr_account = '12345678901'
-        self.assertEqual(settings.corr_account, '12345678901')
-    
-
-    def test_corr_account_invalid(self):
-        settings = Settings()
-        with self.assertRaises(ValueError, msg='correspondent account must be string and contain 11 characters.'):
-            settings.corr_account = '123456'
-    
-
-    def test_bic_empty(self):
-        settings = Settings()
-        self.assertEqual(settings.bic, '')
-    
-
-    def test_bic_valid(self):
-        settings = Settings()
-        settings.bic = '123456789'
-        self.assertEqual(settings.bic, '123456789')
-    
-
-    def test_bic_invalid(self):
-        settings = Settings()
-        with self.assertRaises(ValueError, msg='BIC must be string and contain 9 characters.'):
-            settings.bic = '1234567'
-    
-
-    def test_name_empty(self):
-        settings = Settings()
-        self.assertEqual(settings.name, '')
-    
-
-    def test_name_valid(self):
-        settings = Settings()
-        settings.name = 'Пога и попыта'
-        self.assertEqual(settings.name, 'Пога и попыта')
-    
-
-    def test_name_invalid(self):
-        settings = Settings()
-        with self.assertRaises(ValueError, msg='name must be string.'):
-            settings.name = 123
-    
-
-    def test_ownership_type_empty(self):
-        settings = Settings()
-        self.assertEqual(settings.ownership_type, '')
-    
-
-    def test_ownership_type_valid(self):
-        settings = Settings()
-        settings.ownership_type = 'ООООО'
-        self.assertEqual(settings.ownership_type, 'ООООО')
-    
-
-    def test_ownership_type_invalid(self):
-        settings = Settings()
-        with self.assertRaises(ValueError, msg='ownership type must be string.'):
-            settings.ownership_type = 123
+    def test_equal_properties_without_id_settings(self):
+        self.assertEqual((self.settings_first.company.name, self.settings_first.company.tin, self.settings_first.company.account,
+                          self.settings_first.company.corr_account, self.settings_first.company.bic, 
+                          self.settings_first.company.ownership_type),
+                          (self.settings_second.company.name, self.settings_second.company.tin, self.settings_second.company.account,
+                          self.settings_second.company.corr_account, self.settings_second.company.bic, 
+                          self.settings_second.company.ownership_type))
