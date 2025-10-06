@@ -5,7 +5,7 @@ from src.utils.fields import ValidatedField
 
 
 class Nomenclature(BaseModel):
-    fullname = ValidatedField(str, max_length = 255, strip = True, nullable = False, blank = False, default = 'nomeclaturefullname')
+    fullname = ValidatedField(str, max_length = 255, strip = True, nullable = False, blank = False, default = 'nomenclaturefullname')
     nomenclature_group = ValidatedField(NomenclatureGroup, nullable = False, blank = False)
     measurement_unit = ValidatedField(MeasurementUnit, nullable = False, blank = False)
 
