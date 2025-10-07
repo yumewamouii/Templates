@@ -61,16 +61,15 @@ class StartService:
     def __default_create_recipes(self):
         # Define a simple demo recipe (Margarita Pizza) with ingredients and preparation steps
         g = MeasurementUnit.create_g()
-        kg = MeasurementUnit.create_kg()
         pcs = MeasurementUnit.create_piece()
 
         pizza_recipe = Recipe(title='Margarita Pizza', servings='2 servings')
 
         # Ingredients with different measurement units
-        pizza_recipe.add_ingredients(Ingredient(name='Flour', value=200, unit=g))
-        pizza_recipe.add_ingredients(Ingredient(name='Water', value=120, unit=g))
-        pizza_recipe.add_ingredients(Ingredient(name='Mozzarella cheese', value=150, unit=g))
-        pizza_recipe.add_ingredients(Ingredient(name='Eggs', value=2, unit=pcs))
+        pizza_recipe.add_ingredient(Ingredient(fullname='Flour', value=200, unit=g))
+        pizza_recipe.add_ingredient(Ingredient(fullname='Water', value=120, unit=g))
+        pizza_recipe.add_ingredient(Ingredient(fullname='Mozzarella cheese', value=150, unit=g))
+        pizza_recipe.add_ingredient(Ingredient(fullname='Eggs', value=2, unit=pcs))
 
         # Step-by-step preparation process
         pizza_recipe.add_step(RecipeStep(

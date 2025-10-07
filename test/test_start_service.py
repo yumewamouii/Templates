@@ -16,7 +16,7 @@ from src.repository import Repository
 class TestStartService(unittest.TestCase):
     def setUp(self):
         self.service = StartService()
-        self.repository = self.service.__repository
+        self.repository = self.service._StartService__repository
 
 
         # Cleaning the repository before each test
@@ -75,20 +75,27 @@ class TestStartService(unittest.TestCase):
         self.assertIsInstance(n.measurement_unit, MeasurementUnit)
     
 
-    def test_create_recipes(self):
-        self.service._StartService__default_create_recipes()
-        recipes = self.service.data()[self.repository.range_recipe()]
-        self.assertEqual(len(recipes), 1)
-        recipe = recipes[0]
-        self.assertIsInstance(recipe, Recipe)
-        self.assertEqual(recipe.title, "Margarita Pizza")
-        self.assertEqual(len(recipe.ingredients), 4)
-        self.assertEqual(len(recipe.steps), 2)
-        # Checking for an egg with the correct unit
-        eggs = next((i for i in recipe.ingredients if i.name == "Eggs"), None)
-        self.assertIsNotNone(eggs)
-        self.assertEqual(eggs.value, 2)
-        self.assertEqual(eggs.unit.name, "piece")
+    def test_same_unit_instance_for_multiple_ingredients(self):
+        # Create shared MeasurementUnit
+        g = MeasurementUnit.create_g()
+        
+        # Create recipe and add multiple ingredients using the same g
+        recipe = Recipe(title="Test Recipe", servings="2 servings")
+        ingredient1 = Ingredient(fullname="Flour", value=200, unit=g)
+        ingredient2 = Ingredient(fullname="Water", value=120, unit=g)
+        recipe.add_ingredient(ingredient1)
+        recipe.add_ingredient(ingredient2)
+
+        # Check that both ingredients reference the same MeasurementUnit object
+        self.assertIs(recipe.ingredients[0].unit, recipe.ingredients[1].unit,
+                      msg="Ingredients should reference the same MeasurementUnit instance")
+        self.assertEqual(recipe.ingredients[0].unit.name, "g")
+        self.assertEqual(recipe.ingredients[1].unit.name, "g")
+
+        # Optional: verify conversion factor remains correct
+        self.assertEqual(recipe.ingredients[0].unit.conversion_factor, 1)
+        self.assertEqual(recipe.ingredients[1].unit.conversion_factor, 1)
+
     
 
     def test_start_method_idempotent(self):

@@ -13,18 +13,25 @@ class MeasurementUnit(BaseModel):
     conversion_factor = ValidatedField(int, nullable = False, blank = False, default = 1)
 
 
+    def __init__(self):
+        super().__init__()
+        self.id = str(uuid.uuid4().hex)
+
+
+    # Cache for unique unit instances (Singleton like)
+    # Singleton cache
+    __registry: dict[str, 'MeasurementUnit'] = {}
+
     @classmethod
     def create(cls, name: str, factor: int = 1, base: 'MeasurementUnit' | None = None) -> 'MeasurementUnit':
-        """
-        A universal factory method for creating measurement units.
-        :param name: name of unit
-        :param factor: conversion factor
-        :param base: basic unit of measurement or None
-        """
+        key = name.lower()
+
+        # Return existing instance if present
+        if key in cls.__registry:
+            return cls.__registry[key]
 
         unit = cls()
         unit.name = name
-
 
         if base is None:
             unit.basic_unit = name
@@ -32,24 +39,29 @@ class MeasurementUnit(BaseModel):
         else:
             unit.basic_unit = base.basic_unit
             unit.conversion_factor = factor
+
+        cls.__registry[key] = unit
         return unit
+
     
 
-    @staticmethod
-    def create_g() -> 'MeasurementUnit':
-        return MeasurementUnit.create('g', 1)
+    # Factory methods using shared cache
+    @classmethod
+    def create_g(cls) -> 'MeasurementUnit':
+        return cls.create('g', 1)
     
 
-    def create_kg() -> 'MeasurementUnit':
-        g = MeasurementUnit.create_g()
-        return MeasurementUnit.create('kg', 1000, g)
+    @classmethod
+    def create_kg(cls) -> 'MeasurementUnit':
+        g = cls.create_g()
+        return cls.create('kg', 1000, g)
 
 
-    def create_piece() -> 'MeasurementUnit':
-        g = MeasurementUnit.create_g()
-        return MeasurementUnit.create('piece', 55, g)
+    @classmethod
+    def create_piece(cls) -> 'MeasurementUnit':
+        g = cls.create_g()
+        return cls.create('pcs', 55, g)
         
-
 
     def __str__(self):
         return (f'Identification number: {self.id}\n'
