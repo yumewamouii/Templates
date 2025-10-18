@@ -8,28 +8,36 @@ from src.utils.fields import ValidatedField
 
 
 class MeasurementUnit(BaseModel):
+    name = ValidatedField(str, strip = True, nullable = False, max_length = 50)
     basic_unit = ValidatedField(str, strip = True, nullable = True, max_length = 50)
     conversion_factor = ValidatedField(int, nullable = False, blank = False, default = 1)
 
 
-    #Create a new MeasurementUnit object with a given name and conversion factor
+    def __init__(self):
+        super().__init__()
+        self.id = str(uuid.uuid4().hex)
+
+
     @classmethod
-    def range_model(cls, name: str, factor: int = 1, base_unit: 'MeasurementUnit' | None = None) -> 'MeasurementUnit':
+    def create(cls, name: str, factor: int = 1, base: 'MeasurementUnit' | None = None) -> 'MeasurementUnit':
         unit = cls()
-        unit.basic_unit = name
+        unit.name = name
 
 
-        if base_unit is None:
+        if base is None:
+            unit.basic_unit = name
             unit.conversion_factor = 1
         else:
+            unit.basic_unit = base.basic_unit
             unit.conversion_factor = factor
-            unit.basic_unit = base_unit.basic_unit
 
 
         return unit
+        
 
     def __str__(self):
         return (f'Identification number: {self.id}\n'
+                f'Unit name: {self.name}\n'
                 f'Basic unit of measurement: {self.basic_unit}\n'
                 f'Conversion factor: {self.conversion_factor}')
 
