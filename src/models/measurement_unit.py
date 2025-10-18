@@ -18,20 +18,11 @@ class MeasurementUnit(BaseModel):
         self.id = str(uuid.uuid4().hex)
 
 
-    # Cache for unique unit instances (Singleton like)
-    # Singleton cache
-    __registry: dict[str, 'MeasurementUnit'] = {}
-
     @classmethod
     def create(cls, name: str, factor: int = 1, base: 'MeasurementUnit' | None = None) -> 'MeasurementUnit':
-        key = name.lower()
-
-        # Return existing instance if present
-        if key in cls.__registry:
-            return cls.__registry[key]
-
         unit = cls()
         unit.name = name
+
 
         if base is None:
             unit.basic_unit = name
@@ -40,27 +31,8 @@ class MeasurementUnit(BaseModel):
             unit.basic_unit = base.basic_unit
             unit.conversion_factor = factor
 
-        cls.__registry[key] = unit
+
         return unit
-
-    
-
-    # Factory methods using shared cache
-    @classmethod
-    def create_g(cls) -> 'MeasurementUnit':
-        return cls.create('g', 1)
-    
-
-    @classmethod
-    def create_kg(cls) -> 'MeasurementUnit':
-        g = cls.create_g()
-        return cls.create('kg', 1000, g)
-
-
-    @classmethod
-    def create_piece(cls) -> 'MeasurementUnit':
-        g = cls.create_g()
-        return cls.create('pcs', 55, g)
         
 
     def __str__(self):

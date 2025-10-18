@@ -4,11 +4,13 @@ from src.models.nomenclature_group import NomenclatureGroup
 from src.models.recipe import Recipe, Ingredient, RecipeStep
 
 from src.repository import Repository
+from src.measurement_unit_repository import MeasurementUnitRepository
 from src.utils.fields import ValidatedField
 
 
 class StartService:
     __repository: Repository = Repository()
+    __unit_repository: MeasurementUnitRepository = MeasurementUnitRepository()
 
     # Ensure StartService is a singleton – only one instance will exist in the application.
     def __new__(cls):
@@ -37,10 +39,15 @@ class StartService:
     
 
     def __default_create_measurement_units(self):
-        # Register commonly used measurement units (g, kg, pcs) into the repository
-        self.create(self.__repository.range_measurement_unit_key(), MeasurementUnit.create_g())
-        self.create(self.__repository.range_measurement_unit_key(), MeasurementUnit.create_kg())
-        self.create(self.__repository.range_measurement_unit_key(), MeasurementUnit.create_piece())
+        units = [
+            self.__unit_repository.create_g(),
+            self.__unit_repository.create_kg(),
+            self.__unit_repository.create_pcs()
+        ]
+
+        key = self.__repository.range_measurement_unit_key()
+        for unit in units:
+            self.create(key, unit)
 
 
     def __default_create_nomenclature_groups(self):

@@ -4,3 +4,5 @@
 /.__pycache__/
 /.VSCodeCounter/
 /.vscode/
+/venv/
+/__pycache__/
