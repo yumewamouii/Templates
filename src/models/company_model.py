@@ -2,9 +2,6 @@ class companyModel:
     __name: str = ""
     __inn: str = ""
 
-    def __init__(self, name, inn):
-        self.__name = name
-        self.__inn = inn
 
     @property
     def name(self) -> str:
