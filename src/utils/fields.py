@@ -48,7 +48,7 @@ class ValidatedField:
 
 # Sets the field value, enforcing type, blank/null rules, and validation.
     def __set__(self, obj: object, value: Any) -> None:
-        if value is None:
+        if value is None and not self.__nullable:
             if self.__blank:
                 if self.__expected_type == str:
                     setattr(obj, self.__private_name, '')

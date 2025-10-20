@@ -5,8 +5,8 @@ class MeasurementUnitRepository:
     def __init__(self):
         self.__cache: dict[str, MeasurementUnit] = {}
     
-
-    def get_or_create(self, name: str, factor: int = 1, base: 'MeasurementUnit' | None = None) -> 'MeasurementUnit':
+    
+    def get_or_create(self, name: str, factor: int = 1, base: MeasurementUnit | None = None) -> MeasurementUnit:
         key = name.lower()
         if key not in self.__cache:
             self.__cache[key] = MeasurementUnit.create(name = name, factor = factor,

@@ -2,8 +2,14 @@ import os
 import json
 
 from src.models.settings import Settings
+
+
 from src.utils.file_search import find_file
 from src.utils.fields import ValidatedField
+from src.utils.validator import Validator
+from src.utils.model_metadata import ModelMetadata
+
+
 from src.exceptions.validation import ArgumentException, OperationException
 
 
@@ -40,9 +46,7 @@ class SettingManager:
             raise OperationException(f'Failed to load settings from json file: {e}')
 
     def convert(self, data: dict) -> None:
-        data = ValidatedField(dict, nullable = True, blank = True)
-        #if not isinstance(data, dict):
-            #raise ArgumentException('Input data must be a dictionary')
+        Validator.validate(data, dict)
         
         field_types = {
             'tin': int,
