@@ -7,13 +7,16 @@ from src.utils.fields import ValidatedField
 
 
 class BaseModel(AbstractBaseModel):
-    id = ValidatedField(str, strip = True, default = lambda: str(uuid.uuid4().hex), nullable = False)
+    id = ValidatedField(str, strip = True, default = lambda: str(uuid.uuid4().hex), nullable = True)
     def __init__(self):
         super().__init__()
 
 
 #The comparison with id, other can be a UUID string
     def __eq__(self, other: str) -> bool:
+
+        if isinstance(other, BaseModel):
+            return self.id == other.id
         if isinstance(other, str):
             return self.id == other
         return False

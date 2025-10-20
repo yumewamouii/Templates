@@ -5,10 +5,18 @@ from src.utils.fields import ValidatedField
 
 
 class Nomenclature(BaseModel):
-    fullname = ValidatedField(str, max_length = 255, strip = True, nullable = False, blank = False, default = 'nomenclaturefullname')
-    nomenclature_group = ValidatedField(NomenclatureGroup, nullable = False, blank = False)
-    measurement_unit = ValidatedField(MeasurementUnit, nullable = False, blank = False)
+    fullname = ValidatedField(str, max_length = 255, strip = True, nullable = True, blank = False, default = 'nomenclaturefullname')
+    nomenclature_group = ValidatedField(NomenclatureGroup | None, nullable = True, blank = False)
+    measurement_unit = ValidatedField(MeasurementUnit | None, nullable = True, blank = False)
 
 
-    def __str__(self):
-        return (f'Fullname is {self.fullname}')
+    @staticmethod
+    def create(id: str, name: str, nomenclature_group: NomenclatureGroup, measurement_unit: MeasurementUnit):
+        item = Nomenclature()
+        item.id = id
+        item.fullname = name
+        item.nomenclature_group = nomenclature_group
+        item.measurement_unit = measurement_unit
+
+
+    
