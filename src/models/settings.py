@@ -21,6 +21,9 @@ from src.exceptions.validation import OperationException, ArgumentException
 
 
 class Settings(BaseModel):
+    _instance = None
+
+
     _company: Company = Company()
     _default_report_format: ReportFormat = None
     _report_map: dict[ReportFormat, type] = {
@@ -31,9 +34,17 @@ class Settings(BaseModel):
     }
 
 
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+
     def __init__(self, default_report_format: ReportFormat = ReportFormat.JSON):
-        self.company = Company()
-        self._default_report_format = default_report_format
+        if not hasattr(self, '_initialized'):
+            self.company = Company()
+            self._default_report_format = default_report_format
+            self._initialized = True
     
 
     @property
@@ -43,7 +54,7 @@ class Settings(BaseModel):
     @default_report_format.setter
     def default_report_format(self, value: ReportFormat):
         if not isinstance(value, ReportFormat):
-            raise InvalidTypeException(ReportFormat, type(value))
+            raise ArgumentException(ReportFormat, type(value))
         self._default_report_format = value
 
     @property
@@ -53,7 +64,7 @@ class Settings(BaseModel):
     @report_map.setter
     def report_map(self, value: dict):
         if not isinstance(value, dict):
-            raise InvalidTypeException(dict, type(value))
+            raise ArgumentException(dict, type(value))
         for v in value.values():
             if not issubclass(v, BaseReport):
                 raise OperationException(BaseReport, type(v))

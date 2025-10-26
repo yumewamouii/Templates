@@ -22,7 +22,7 @@ class BaseReport(ABC):
         pass
 
 
-    # Recursively serializes the model into a dictionary
+    # Recursively serializes the model into a dictionary 
     def _serialize_model(self, model: Any) -> dict:
         def extract_properties(obj: Any) -> dict:
             return {
