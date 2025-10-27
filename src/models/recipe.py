@@ -19,21 +19,17 @@ class Ingredient(Nomenclature):
     
 
     @staticmethod
-    def create(fullname: str, value: int, unit: MeasurementUnit):
-        item = Ingredient
+    def create(nomenclature: Nomenclature, value: int, unit: MeasurementUnit) -> 'Ingredient':
+        item = Ingredient()
 
 
-        item.fullname = fullname
+        item.nomenclature = nomenclature
         item.value = value
         item.measurement_unit = unit
 
 
         return item
 
-
-    def __str__(self):
-        # Human-readable representation: e.g. "200 g Flour"
-        return f'{self.value} {self.unit.basic_unit} {self.fullname}'
 
 
 class RecipeStep(BaseModel):
@@ -45,6 +41,9 @@ class Recipe(Nomenclature):
     # Represents a complete recipe, including metadata (title, servings),
     # a list of ingredients, and step-by-step instructions.
     #title = ValidatedField(str, max_length = 150, strip = True, nullable = False)
+    def __init__(self):
+        super().__init__()
+
 
     servings = ValidatedField(int, max_length = 50, strip = True, nullable = False, default = 0)
     ingredients = ValidatedField(list, nullable = False, default = [])
@@ -61,13 +60,27 @@ class Recipe(Nomenclature):
     
 
     @staticmethod
-    def create(name: str, cooking_time: str, servings: int) -> 'Recipe':
+    def create(
+            name: str,
+            nomenclature_groups: list,
+            measurement_units: list,
+            nomenclatures: list,
+            ingredients: list,
+            steps: list,
+            servings: int,
+            cooking_time: str,
+            ) -> 'Recipe':
         item = Recipe()
 
 
-        item.fullname = name
-        item.cooking_time = cooking_time
+        item.name = name
+        item.nomenclature_groups = nomenclature_groups
+        item.measurement_units = measurement_units
+        item.nomenclatures = nomenclatures
+        item.ingredients = ingredients
+        item.steps = steps
         item.servings = servings
+        item.cooking_time = cooking_time
 
 
         return item

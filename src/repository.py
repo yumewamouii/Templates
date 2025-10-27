@@ -1,8 +1,15 @@
+from typing import Any
+
+
 from src.models.measurement_unit import MeasurementUnit
 from src.models.recipe import Recipe
 
 
 from src.utils.fields import ValidatedField
+
+
+from src.serialization.model_serializer import ModelSerializer
+from src.serialization.serializer_factory import SerializerFactory
 
 
 class Repository:
@@ -55,7 +62,16 @@ class Repository:
     
 
     def get_recipes(self) -> Recipe:
-        return self.data['recipes']
+        serializer = SerializerFactory()
+        return [serializer.get_serializer(recipe) for recipe in self.data['recipes']]
+    
+
+    def get_recipe_by_id(self, recipe_id: str) -> dict[str, Any]:
+        serializer = SerializerFactory()
+        for recipe in self.data['recipes']:
+            if recipe.id == recipe_id:
+                return serializer.get_serializer(recipe)
+        return None
     
 
     def add_recipe(self, recipe: Recipe) -> None:
