@@ -11,12 +11,14 @@ from src.dtos.measurement_unit_dto import MeasurementUnitDTO
 from src.dtos.nomenclature_dto import NomenclatureDTO
 from src.dtos.nomenclature_group_dto import NomenclatureGroupDTO
 from src.dtos.ingredient_dto import IngredientDTO
+from src.dtos.recipe_dto import RecipeDTO
 
 
 from src.mappers.measurement_unit_mapper import MeasurementUnitMapper
 from src.mappers.nomenclature_group_mapper import NomenclatureGroupMapper
 from src.mappers.nomenclature_mapper import NomenclatureMapper
 from src.mappers.ingredient_mapper import IngredientMapper
+from src.mappers.recipe_mapper import RecipeMapper
 
 
 from src.repository import Repository
@@ -68,7 +70,7 @@ class StartService:
     def load_settings(self, path: str = 'settings.json') -> dict:
         abs_path = find_file(filename = path)
         with open(abs_path, encoding = 'utf-8') as file:
-            return json.load(file)['default_receipt']
+            return json.load(file)
     
 
     def _save_item(self, key: str, dto, item):
@@ -132,59 +134,31 @@ class StartService:
             self._save_item(self._repository.range_nomenclature_key(), dto, item)
     
 
-    def convert(self, data: dict) -> None:
+    def convert_recipes(self, data: dict) -> None:
         Validator.validate(data, dict)
-        if 'cooking_time' in data:
-            cooking_time = data['cooking_time']
+        if 'recipes' in data:
+            recipes = data['recipes']
         else:
-            cooking_time = ''
+            recipes = []
         
 
-        if 'portions' in data:
-            portions = int(data['portions'])
-        else:
-            portions = 0
+        if len(recipes) == 0:
+            raise ArgumentException('Recipes are missing in the file')
         
 
-        if 'name' in data:
-            name = data['name']
-        else:
-            name = 'UNKNOWN'
-        
+        for recipe_data in recipes:
+            recipe_dto = RecipeDTO.create(recipe_data)
+            recipe = RecipeMapper.from_dto(recipe_dto, self._cache)
 
-        self._recipe = Recipe.create(name, cooking_time, portions)
+            self._convert_measurement_units(recipe_data)
+            self._convert_nomenclature_groups(recipe_data)
+            self._convert_nomenclatures(recipe_data)
 
-
-        if 'steps' in data:
-            steps = data['steps']
-        else:
-            steps = []
-        for step in steps:
-            Validator.validate(step, str)
-            if step.strip():
-                self._recipe.add_step(step)
-        
-
-        self._convert_measurement_units(data)
-        self._convert_nomenclature_groups(data)
-        self._convert_nomenclatures(data)
-
-
-        if 'ingredients' in data:
-            ingredients = data['ingredients']
-        else:
-            ingredients = []
-        for ingredient in ingredients:
-            dto = IngredientDTO.create(ingredient)
-            item = IngredientMapper.from_dto(dto, self._cache)
-            self._recipe.add_ingredient(item)
-        
-
-        self._repository.data[self._repository.range_recipe()].append(self._recipe)
+            self._save_item(self._repository.range_recipe(), recipe_dto, recipe)
 
 
     def start(self):
         filename = 'settings.json'
         settings = self.load_settings(filename)
-        self.convert(settings)
+        self.convert_recipes(settings)
     

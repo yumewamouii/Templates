@@ -23,7 +23,8 @@ class BaseReport(ABC):
 
 
     # Recursively serializes the model into a dictionary 
-    def _serialize_model(self, model: Any) -> dict:
+    @staticmethod
+    def _serialize_model(model: Any) -> dict:
         def extract_properties(obj: Any) -> dict:
             return {
                 name: getattr(obj, name)
@@ -42,9 +43,9 @@ class BaseReport(ABC):
         # Recursively processing nested objects
         for key, value in serialized.items():
             if isinstance(value, list):
-                serialized[key] = [self._serialize_model(item) for item in value]
+                serialized[key] = [BaseReport._serialize_model(item) for item in value]
             elif hasattr(value, '__dict__'):
-                serialized[key] = self._serialize_model(value)
+                serialized[key] = BaseReport._serialize_model(value)
         
 
         return serialized

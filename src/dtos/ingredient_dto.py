@@ -8,4 +8,4 @@ from src.dtos.base_dto import BaseDTO
 class IngredientDTO(BaseDTO):
     nomenclature_id: str
     measurement_unit_id: str
-    value: str
+    value: int
