@@ -24,7 +24,16 @@ class SerializerFactory:
         }
     
 
-    def get_serializer(self, obj: Any) -> BaseSerializer:
+    def get_serializer(self, obj: Any) -> str:
+        if isinstance(obj, list):
+            return json.dumps([json.loads(self.get_serializer(item)) for item in obj])
+
+        if isinstance(obj, dict):
+            return json.dumps({
+                key: json.loads(self.get_serializer(value))
+                for key, value in obj.items()
+            })
+
         for serializer_cls in self._serializer_map.values():
             serializer = serializer_cls()
             try:
@@ -32,4 +41,5 @@ class SerializerFactory:
                 return json.dumps(data)
             except ArgumentException:
                 continue
+
         raise ArgumentException(f'No suitable serializer found for type: {type(obj).__name__}')
