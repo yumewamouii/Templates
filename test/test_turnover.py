@@ -1,4 +1,6 @@
 import unittest
+import random
+import time
 from datetime import datetime
 
 
@@ -7,7 +9,17 @@ from src.models.measurement_unit import MeasurementUnit
 from src.models.nomenclature import Nomenclature
 from src.models.storage import Storage
 from src.models.store_transaction import StoreTransaction, StoreTransactionType
-from src.utils.turnovers_from_transactions import TurnoversFromTransactionsPrototype
+from src.models.range import RangeModel
+from src.models.filter import Filter
+from src.models.filter_type import FilterType
+from src.models.store_turnover import StoreTurnover
+from src.mappers.absolute_mapper import AbsoluteMapper
+from src.utils.turnovers_from_transactions import TurnoversFromTransactions
+from src.store.start_store_factory import StartStoreFactory
+from src.store.store_repository import StoreRepository
+from src.store.store_transaction_storage import StoreTransactionStorage
+from src.store.list_filterer import ListFilterer
+
 
 
 
@@ -39,15 +51,77 @@ class TestTurnoversFromTransactionsPrototype(unittest.TestCase):
             ),
         ]
 
+    def generated_transaction(self):
+        storages = StartStoreFactory().storages()
+        result = []
+
+
+        for i in range(10000):
+            transaction_type = random.randint(0, 1)
+            if transaction_type == 0:
+                transaction_type = StoreTransactionType.INCOME
+            else:
+                transaction_type = StoreTransactionType.EXPENSE
+        
+            result.append(
+                StoreTransaction(
+                   store = storages[i % len(storages)],
+                   nomenclature=self.sugar,
+                   amount = MeasuredValue(random.randint(1, 100), self.kg),
+                   transaction_type = transaction_type,
+                   time = datetime.fromtimestamp(0)
+                )
+            )
+        
+
+        return result
+    
+    
+    
     def test_turnover_calculation(self):
-        process = TurnoversFromTransactionsPrototype()
+        process = TurnoversFromTransactions()
         turnover = process.calculate(self.transactions, ['nomenclature', 'store'])
 
         expected = MeasuredValue(25.0, self.kg)
         self.assertEqual(turnover[0].turnover, expected)
+    
+
+    def test_cached_calculation(self, generated_transaction):
+        repo = StoreRepository()
+        trans = StoreTransactionStorage()
+        for transaction in generated_transaction:
+            trans.create(transaction)
+        
+
+        t = time.process_time()
+        no_caching_result = repo.get_turnovers(
+            [Filter('time', RangeModel(datetime.fromtimestamp(0), datetime.now()), FilterType.BETWEEN)],
+            StoreTurnover.default_grouping(), datetime.now()
+        )
+        t1 = time.process_time() - t
+
+
+        t = time.process_time()
+        caching_result = repo.get_turnovers(
+            [Filter('time', RangeModel(datetime.fromtimestamp(0), datetime.now()), FilterType.BETWEEN)],
+            StoreTurnover.default_grouping(), datetime.now()
+        )
+
+        t2 = time.process_time() - t
+
+
+        print()
+
+
+        print('Без кэша:', 'Время выполнения:', t1)
+        print('С кэшем: ', 'Время выполнения:', t2)
+
+
+        assert len(caching_result) == len(no_caching_result)
+        assert t2 < t1
 
     def test_turnover_calculation_with_different_nomenclature(self):
-        process = TurnoversFromTransactionsPrototype()
+        process = TurnoversFromTransactions()
 
         self.transactions.append(
             StoreTransaction(

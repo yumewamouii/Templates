@@ -8,7 +8,7 @@ class Grouping:
     """
 
     @staticmethod
-    def group(data: list, groups: list[str]) -> list:
+    def group(data: list, groups: list[str], value_to_group: str = None) -> list:
         """
         Groups a list of objects based on one or more attributes.
 
@@ -23,15 +23,15 @@ class Grouping:
         # groupby requires the data to be sorted by the key function first
         sorted_data = sorted(
             data,
-            key=lambda x: tuple(Grouping._get_property(x, group) for group in groups)
+            key=lambda x: tuple(Grouping._get_property(x, group, value_to_group) for group in groups)
         )
         return groupby(
             sorted_data,
-            key=lambda x: tuple(Grouping._get_property(x, group) for group in groups)
+            key=lambda x: tuple(Grouping._get_property(x, group, value_to_group) for group in groups)
         )
 
     @staticmethod
-    def _get_property(model, group: str):
+    def _get_property(model, group: str, value_to_group: str = None):
         """
         Resolves a nested attribute from an object using dot notation.
 
@@ -45,6 +45,11 @@ class Grouping:
         item_dict = AbsoluteMapper.to_dict(model)
         keys_array = group.split('.')
         inner_value = item_dict
+
+        if value_to_group is not None:
+            inner_value = inner_value.get(value_to_group, None)
+            if inner_value is None:
+                return False
 
         for key in keys_array:
             inner_value = inner_value.get(key, None)

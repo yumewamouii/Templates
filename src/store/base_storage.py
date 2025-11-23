@@ -42,6 +42,11 @@ class BaseStorage(Generic[K, V], ABC):
 
 
     @abstractmethod
+    def clear(self):
+        pass
+
+
+    @abstractmethod
     def is_empty(self) -> bool:
         pass
     
