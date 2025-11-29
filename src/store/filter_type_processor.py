@@ -35,10 +35,21 @@ class FilterTypeProcessor(ABC):
             if inner_value is None:
                 return False
 
+
+        return self._process_item(inner_value, filter, keys_array)            
+    
+
+    def _process_item(self, inner_value: dict, filter: Filter, keys_array: list[str]) -> bool:
+        key_idx = 0
+
+
         for key in keys_array:
+            if isinstance(inner_value, list):
+                return any([self._process_item(value, filter, keys_array[key_idx + 1:]) for value in inner_value])
             inner_value = inner_value.get(key, None)
             if inner_value is None:
                 return False
+            key_idx += 1
 
         return self._process_internal(str(inner_value).lower(), str(filter.value).lower())
 
