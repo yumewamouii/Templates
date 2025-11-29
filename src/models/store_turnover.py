@@ -19,3 +19,8 @@ class StoreTurnover(BaseModel):
 
         self.turnover = turnover
         self.group = group
+    
+
+    @staticmethod
+    def default_grouping() -> list[str]:
+        return ['nomenclature.id', 'store.id']

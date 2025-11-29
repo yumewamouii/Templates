@@ -1,14 +1,19 @@
-from datetime import datetime
+import datetime
 from typing import List
+from copy import deepcopy
 
 from src.store.start_store_factory import StartStoreFactory
+from src.store.list_filterer import ListFilterer
 from src.store.store_storage import StoreStorage
 from src.store.store_transaction_storage import StoreTransactionStorage
+from src.store.turnover_storage import TurnoverStorage
 from src.models.filter import Filter
+from src.models.filter_type import FilterType
+from src.models.filter_utils import FilterUtils
 from src.models.storage import Storage
 from src.models.store_transaction import StoreTransaction
 from src.models.store_turnover import StoreTurnover
-from src.utils.turnovers_from_transactions import TurnoversFromTransactionsPrototype
+from src.utils.turnovers_from_transactions import TurnoversFromTransactions
 
 
 class StoreRepository:
@@ -21,6 +26,7 @@ class StoreRepository:
         self,
         store_transaction_storage: StoreTransactionStorage,
         store_storage: StoreStorage,
+        turnover_storage: TurnoverStorage,
         start_store_factory: StartStoreFactory
     ):
         """
@@ -31,6 +37,7 @@ class StoreRepository:
         """
         self._store_transaction_storage = store_transaction_storage
         self._store_storage = store_storage
+        self._turnover_storage = turnover_storage
         self._start_store_factory = start_store_factory
 
     def init_start_stores(self):
@@ -70,16 +77,49 @@ class StoreRepository:
         """
         return self._store_transaction_storage.get_filtered(filters)
 
-    def get_turnovers(self, filters: List[Filter], grouping: List[str]) -> List[StoreTurnover]:
-        """
-        Calculate turnovers from store transactions filtered and grouped.
+    def get_turnovers(self, filters: List[Filter], grouping: List[str], blocking_date: datetime.datetime) -> List[StoreTurnover]:
+        time_filter = FilterUtils.find_filter(filters, 'time', FilterType.BETWEEN)
 
-        Args:
-            filters (List[Filter]): Filters to apply to transactions.
-            grouping (List[str]): Fields to group transactions by.
 
-        Returns:
-            List[StoreTurnover]: Calculated turnovers grouped by specified fields.
-        """
+        if time_filter.value.from_value is not None and time_filter.value.from_value > datetime.datetime.min:
+            return TurnoversFromTransactions.calculate(
+                self._store_transaction_storage.get_filtered(filters),
+                grouping
+            )
+
+
+        cached_turnovers = self._get_cached_turnovers(filters, grouping, blocking_date)
+        time_filter.value.from_value = blocking_date
         transactions = self._store_transaction_storage.get_filtered(filters)
-        return TurnoversFromTransactionsPrototype().calculate(transactions, grouping)
+
+
+        new_turnovers = TurnoversFromTransactions().calculate(transactions, grouping)
+
+
+        return TurnoversFromTransactions.merge(cached_turnovers, new_turnovers)
+    
+
+    def _get_cached_turnovers(self, filters: list[Filter], grouping: list[str], blocking_date: datetime.datetime) -> List[StoreTurnover]:
+        turnovers = self._turnover_storage.get(blocking_date.timestamp())
+
+
+        filters = deepcopy(filters)
+
+
+        if turnovers is None or grouping != StoreTurnover.default_grouping():
+            time_filter = FilterUtils.find_filter(filters, 'time', FilterType.BETWEEN)
+            time_filter.value.from_value = datetime.datetime.min
+            time_filter.value.to_value = blocking_date
+            self._turnover_storage.clear()
+
+
+            transaction = self._store_transaction_storage.get_filtered(filters)
+            turnovers = TurnoversFromTransactions().calculate(transaction, grouping)
+            self._turnover_storage.update(blocking_date.timestamp(), turnovers)
+        
+
+        filters = FilterUtils.remove_filter(filters, 'time', FilterType.BETWEEN)
+        turnovers = ListFilterer.apply_filters(turnovers, filters, value_to_filter = 'group')
+
+
+        return turnovers

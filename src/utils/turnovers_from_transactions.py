@@ -60,3 +60,18 @@ class TurnoversFromTransactions:
         group_data = {grouping[i]: key[i] for i in range(len(key))}
 
         return StoreTurnover(turnover=value, group=group_data)
+
+
+    @staticmethod
+    def merge(t1: list[StoreTurnover], t2: list[StoreTurnover]) -> list[StoreTurnover]:
+        groups = {}
+
+
+        for t in t1 + t2:
+            if t.group not in groups:
+                groups[t.group] = t.turnover
+                continue
+            groups[t.group] += t.turnover
+        
+
+        return [StoreTurnover(turnover = value, group = key) for key, value in groups]

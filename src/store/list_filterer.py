@@ -24,7 +24,7 @@ class ListFilterer:
     }
 
     @staticmethod
-    def apply_filters(items: List[T], filters: List[Filter]) -> List[T]:
+    def apply_filters(items: List[T], filters: List[Filter], value_to_filter = None) -> List[T]:
         """
         Filters a list of items based on a list of Filter objects.
 
@@ -38,7 +38,7 @@ class ListFilterer:
         return [
             item for item in items
             if all(
-                ListFilterer.__filterers_map[filter.filter_type].process(item, filter)
+                ListFilterer.__filterers_map[filter.filter_type].process(item, filter, value_to_filter)
                 for filter in filters
             )
         ]

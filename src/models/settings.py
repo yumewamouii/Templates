@@ -1,3 +1,4 @@
+import datetime
 from enum import Enum
 
 
@@ -32,6 +33,7 @@ class Settings(BaseModel):
         ReportFormat.XML: XmlReport,
         ReportFormat.MARKDOWN: MarkdownReport
     }
+    _blocking_date: datetime.datetime = None
 
 
     def __new__(cls, *args, **kwargs):
@@ -40,10 +42,11 @@ class Settings(BaseModel):
         return cls._instance
 
 
-    def __init__(self, default_report_format: ReportFormat = ReportFormat.JSON):
+    def __init__(self, default_report_format: ReportFormat = ReportFormat.JSON, blocking_date: datetime.datetime = None):
         if not hasattr(self, '_initialized'):
-            self.company = Company()
+            self._company = Company()
             self._default_report_format = default_report_format
+            self.blocking_date = blocking_date
             self._initialized = True
     
 
@@ -69,6 +72,18 @@ class Settings(BaseModel):
             if not issubclass(v, BaseReport):
                 raise OperationException(BaseReport, type(v))
         self._report_map = value
+    
+
+    @property
+    def blocking_date(self) -> datetime.datetime:
+        return self._blocking_date
+    
+
+    @blocking_date.setter
+    def blocking_date(self, value: datetime.datetime):
+        if not isinstance(value, datetime.datetime):
+            raise ArgumentException(datetime.datetime, type(value))
+        self._blocking_date = value
 
 
     def __str__(self):

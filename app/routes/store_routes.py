@@ -21,6 +21,12 @@ from src.models.filter_type import FilterType
 from src.store.store_repository import StoreRepository
 
 
+from src.models.store_turnover import StoreTurnover
+
+
+from src.settings_manager import SettingManager
+
+
 def create_blueprint(service):
     bp = Blueprint('store_bp', __name__)
 
@@ -52,6 +58,10 @@ def create_blueprint(service):
         filters = request.filters
         filters.append(Filter('time', RangeModel(request.date_from, request.date_to), FilterType.BETWEEN))
 
-        turnovers = StoreRepository.get_turnovers(filters, ['nomenclature', 'store'])
+
+        settings_manager = SettingManager()
+        blocking_date = settings_manager.settings.blocking_date
+
+        turnovers = StoreRepository.get_turnovers(filters, StoreTurnover.default_grouping(), blocking_date)
 
         return serializer.serialize(turnovers)

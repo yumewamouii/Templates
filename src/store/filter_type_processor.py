@@ -15,7 +15,7 @@ class FilterTypeProcessor(ABC):
     Subclasses implement specific filter logic.
     """
 
-    def process(self, item: T, filter: Filter) -> bool:
+    def process(self, item: T, filter: Filter, value_to_filter = None) -> bool:
         """
         Applies the filter to a given item.
 
@@ -29,6 +29,12 @@ class FilterTypeProcessor(ABC):
         item_dict = AbsoluteMapper.to_dict(item)
         keys_array = filter.key.split('.')
         inner_value = item_dict
+
+        if value_to_filter is not None:
+            inner_value = inner_value.get(value_to_filter, None)
+            if inner_value is None:
+                return False
+
         for key in keys_array:
             inner_value = inner_value.get(key, None)
             if inner_value is None:
