@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import TypeVar, Generic, Optional, List
 
 
-from src.utils.stream.base_observable import BaseObservable
+from utils.observer.base_observable import BaseObservable
 from src.utils.stream.streams import EventStream
 
 

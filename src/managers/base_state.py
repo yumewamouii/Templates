@@ -1,7 +1,10 @@
 from copy import deepcopy
 
 
-class BaseState:
+from src.exceptions.validation import OperationException
+
+
+class BaseState():
     def __init__(self, error = None):
         self._error = error
     

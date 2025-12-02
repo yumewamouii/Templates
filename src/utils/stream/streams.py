@@ -1,7 +1,7 @@
 from typing import TypeVar
 
 
-from src.utils.stream.base_observable import StreamSubscription
+from utils.observer.base_observable import StreamSubscription
 from src.utils.stream.base_stream import BaseStream
 
 
