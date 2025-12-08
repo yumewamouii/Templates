@@ -10,6 +10,7 @@ from src.models.filter import Filter
 
 class BaseMemoryStorage(BaseStorage[K, V], ABC):
     def __init__(self):
+        super().__init__()
         self._data = {}
 
 
@@ -32,6 +33,15 @@ class BaseMemoryStorage(BaseStorage[K, V], ABC):
 
     def create(self, value: V):
         self._data[value.id] = value
+    
+
+    def _update_internal(self, key: K, value: V):
+        self._data[key] = value
+    
+
+    def _delete_internal(self, key: K):
+        if key in self._data:
+            del self._data[key]
     
 
     def clear(self):

@@ -52,6 +52,10 @@ class StoreRepository:
         if self._store_transaction_storage.is_empty():
             for transaction in self._start_store_factory.storage_transactions():
                 self._store_transaction_storage.create(transaction)
+    
+
+    def update_transaction(self, transaction_id: str, transaction: StoreTransaction):
+        self._store_transaction_storage.update(transaction_id, transaction)
 
     def get_stores(self, filters: List[Filter]) -> List[Storage]:
         """

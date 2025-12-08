@@ -9,6 +9,9 @@ from src.models.nomenclature import Nomenclature
 from src.models.nomenclature_group import NomenclatureGroup
 
 
+from src.utils.stream.base_observable import BaseObservable
+
+
 class NomenclatureRepository:
     def __init__(
                  self, 
@@ -47,3 +50,23 @@ class NomenclatureRepository:
         if self._nomenclature_group_storage.is_empty():
             for group in self._start_nomenclature_group:
                 self._nomenclature_group_storage.create(group)
+    
+
+    def create_nomenclature(self, nomenclature: Nomenclature):
+        return self._nomenclature_storage.create(nomenclature)
+    
+
+    def update_nomenclature(self, nomenclature_id: str, nomenclature: Nomenclature):
+        return self._nomenclature_storage.update(nomenclature_id, nomenclature)
+    
+
+    def delete_nomenclature(self, nomenclature_id: str):
+        return self._nomenclature_storage.delete(nomenclature_id)
+    
+
+    def watch_nomenclature_deletions(self) -> BaseObservable[str]:
+        return self._nomenclature_storage.deletions
+    
+
+    def watch_nomenclature_updates(self) -> BaseObservable[Nomenclature]:
+        return self._nomenclature_storage.updates

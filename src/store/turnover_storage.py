@@ -5,4 +5,4 @@ from src.models.store_turnover import StoreTurnover
 
 
 class TurnoverStorage(BaseMemoryStorage[float, StoreTurnover]):
-    pass
+    pass 
