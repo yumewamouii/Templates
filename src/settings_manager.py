@@ -1,6 +1,10 @@
 import os
 import json
 
+
+from datetime import datetime
+
+
 from src.models.settings import Settings
 
 
@@ -11,6 +15,9 @@ from src.utils.model_metadata import ModelMetadata
 
 
 from src.exceptions.validation import ArgumentException, OperationException
+
+
+from src.utils.logging.logger import Logger
 
 
 class SettingManager:
@@ -43,6 +50,7 @@ class SettingManager:
                     return True
             raise ArgumentException(f'File {self.__filename} does not contain "company" section')
         except Exception as e:
+            Logger.error(self.__class__.__name__, f'Failed to load settings from file {filename}, {e}')
             raise OperationException(f'Failed to load settings from json file: {e}')
 
     def convert(self, data: dict) -> None:
@@ -68,4 +76,8 @@ class SettingManager:
                     setattr(self.__settings.company, key, value)
                 except Exception:
                     raise ArgumentException(f"Parameter {key} no in matching keys")
+    
+
+    def change_blocking_date(self, date: datetime):
+        self.__settings.blocking.date = date
 

@@ -20,6 +20,9 @@ from src.reports.xml_report import XmlReport
 from src.exceptions.validation import OperationException, ArgumentException
 
 
+from src.utils.logging.log import LogLevel
+
+
 
 class Settings(BaseModel):
     _instance = None
@@ -34,6 +37,7 @@ class Settings(BaseModel):
         ReportFormat.MARKDOWN: MarkdownReport
     }
     _blocking_date: datetime.datetime = None
+    _log_level: LogLevel = LogLevel.INFO
 
 
     def __new__(cls, *args, **kwargs):
@@ -48,6 +52,18 @@ class Settings(BaseModel):
             self._default_report_format = default_report_format
             self.blocking_date = blocking_date
             self._initialized = True
+    
+
+    @property
+    def log_level(self) -> LogLevel:
+        return self._log_level
+
+
+    @property.setter
+    def log_level(self, value: LogLevel):
+        if not isinstance(value, LogLevel):
+            raise ArgumentException(LogLevel, type(value))
+        self._log_level = value
     
 
     @property

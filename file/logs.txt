@@ -1,0 +1,6 @@
+LogLevel.INFO [2025-12-07T04:01:18.529142] main: Application started
+LogLevel.INFO [2025-12-07T04:01:18.529172] main: Application started
+LogLevel.INFO [2025-12-07T03:54:56.403237] NomenclatureStorage: Created 259034a9-51b0-40d9-9bf2-6b6689e56063
+LogLevel.INFO [2025-12-07T03:59:56.047864] NomenclatureStorage: Updated 259034a9-51b0-40d9-9bf2-6b6689e56063
+LogLevel.INFO [2025-12-07T04:00:23.258337] NomenclatureStorage: Deleted 259034a9-51b0-40d9-9bf2-6b6689e56063
+LogLevel.INFO [2025-12-07T04:01:31.582527] NomenclatureStorage: Could not delete 259034a9-51b0-40d9-9bf2-6b6689e56063 because it does not exist

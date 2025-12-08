@@ -14,6 +14,9 @@ from src.mappers.settings_mapper import SettingsMapper
 from src.models.settings import Settings
 
 
+from src.utils.logging.logger import Logger
+
+
 class SettingsRepository:
     @staticmethod
     def load_from_file(file_name: str) -> Settings:
@@ -47,4 +50,5 @@ class SettingsRepository:
                 json.dump(json_data, f)
                 return True
         except:
+            Logger.error(SettingsRepository.__class__.__name__, 'Unable to save settings to file')
             return False
